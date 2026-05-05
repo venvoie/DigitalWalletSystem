@@ -1,0 +1,103 @@
+﻿<%@ Master Language="C#" AutoEventWireup="true" CodeBehind="Site.master.cs" Inherits="DigitalWalletSystem.SiteMaster" %>
+
+<!DOCTYPE html>
+<html lang="en">
+<head runat="server">
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title><%: Page.Title %> - CloudMoney</title>
+    <link href="~/Styles/Site.css" rel="stylesheet" type="text/css" />
+    <link href="~/favicon.ico" rel="shortcut icon" type="image/x-icon" />
+    <asp:ContentPlaceHolder ID="HeadContent" runat="server" />
+</head>
+<body>
+    <form runat="server">
+        <asp:ScriptManager runat="server" />
+
+        <div class="shell">
+
+            <%-- LEFT SIDEBAR --%>
+            <div class="sidebar">
+                <div class="sidebar-logo">
+                    <div class="logo-icon">&#9729;</div>
+                    <div>
+                        <div class="logo-name">CloudMoney</div>
+                        <div class="logo-sub">DIGITAL WALLET</div>
+                    </div>
+                </div>
+
+                <nav class="sidebar-nav">
+                    <div class="nav-section-label">MAIN</div>
+                    <a href="~/Pages/Main/Dashboard.aspx" runat="server" class="nav-item">
+                        <span class="nav-icon">&#9632;</span> Dashboard
+                    </a>
+
+                    <div class="nav-section-label">TRANSACTIONS</div>
+                    <a href="~/Pages/Main/Deposit.aspx" runat="server" class="nav-item">
+                        <span class="nav-icon">&#8595;</span> Deposit
+                    </a>
+                    <a href="~/Pages/Main/Withdraw.aspx" runat="server" class="nav-item">
+                        <span class="nav-icon">&#8593;</span> Withdraw
+                    </a>
+                    <a href="~/Pages/Main/SendMoney.aspx" runat="server" class="nav-item">
+                        <span class="nav-icon">&#10148;</span> Send CloudMoney
+                    </a>
+
+                    <div class="nav-section-label">REPORTS</div>
+                    <a href="~/Pages/Reports/StatementOfAccount.aspx" runat="server" class="nav-item">
+                        <span class="nav-icon">&#9776;</span> Statement of Account
+                    </a>
+                    <a href="~/Pages/Reports/DepositsWithdrawals.aspx" runat="server" class="nav-item">
+                        <span class="nav-icon">&#8645;</span> Deposits &amp; Withdrawals
+                    </a>
+                    <a href="~/Pages/Reports/SentReceived.aspx" runat="server" class="nav-item">
+                        <span class="nav-icon">&#8652;</span> Sent &amp; Received
+                    </a>
+
+                    <div class="nav-section-label">ACCOUNT</div>
+                    <a href="~/Pages/Account/AccountInfo.aspx" runat="server" class="nav-item">
+                        <span class="nav-icon">&#9998;</span> Account Info
+                    </a>
+                    <a href="~/Pages/Account/ChangePassword.aspx" runat="server" class="nav-item">
+                        <span class="nav-icon">&#128274;</span> Change Password
+                    </a>
+                    <a href="~/Pages/Authentication/Logout.aspx" runat="server" class="nav-item nav-logout">
+                        <span class="nav-icon">&#9099;</span> Log Out
+                    </a>
+                </nav>
+            </div>
+
+            <%-- MAIN CONTENT AREA --%>
+            <div class="main-area">
+
+                <%-- TOP BAR --%>
+                <div class="topbar">
+                    <div class="topbar-title">
+                        <asp:Label ID="lblPageTitle" runat="server" Text="Dashboard" />
+                    </div>
+                    <div class="topbar-user">
+                        <div class="topbar-user-info">
+                            <div class="topbar-name">
+                                <asp:Label ID="lblUserName" runat="server" Text="" />
+                            </div>
+                            <div class="topbar-acct">
+                                Acct # <asp:Label ID="lblAccountNo" runat="server" Text="" />
+                            </div>
+                        </div>
+                        <div class="avatar">
+                            <asp:Label ID="lblInitials" runat="server" Text="" />
+                        </div>
+                    </div>
+                </div>
+
+                <%-- PAGE CONTENT --%>
+                <div class="page-content">
+                    <asp:ContentPlaceHolder ID="MainContent" runat="server" />
+                </div>
+
+            </div>
+        </div>
+
+    </form>
+</body>
+</html>
