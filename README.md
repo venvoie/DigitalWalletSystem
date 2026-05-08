@@ -1,6 +1,6 @@
 **CloudMoney: Digital Wallet System**
 
-A simple web-based digital wallet system built with ASP.NET WebForms and C#, developed as a final project for ASP.NET at CEBU TECHNOLOGICAL UNIVERSITY = MAIN CAMPUS.
+A simple web-based digital wallet system built with ASP.NET WebForms and C#, developed as a final project for ASP.NET at CEBU TECHNOLOGICAL UNIVERSITY - MAIN CAMPUS.
 
 Features:
 - user registration and login
