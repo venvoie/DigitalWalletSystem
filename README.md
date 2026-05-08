@@ -10,7 +10,7 @@ Features:
   
 ---
 
-Tech Stack
+Tech Stack:
 - ASP.NET WebForms (C#, .NET Framework 4.7.2)
 - Microsoft SQL Server
 - Visual Studio 2022
