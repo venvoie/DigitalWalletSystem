@@ -8,37 +8,30 @@ namespace DigitalWalletSystem
 {
 	public partial class SiteMaster : MasterPage
 	{
-		// ── page load — enforce session auth and populate topbar on every page ──
 		protected void Page_Load(object sender, EventArgs e)
 		{
-			// redirect to login if the user session has expired or was never set
 			if (Session["UserID"] == null)
 			{
+				// redirect to login if session has expired or was never set
 				string path = Request.Url.AbsolutePath.ToLower();
 				bool isAuthPage = path.Contains("login") || path.Contains("register");
-				if (!isAuthPage)
-					Response.Redirect("~/Pages/Authentication/Login.aspx");
+				if (!isAuthPage) Response.Redirect("~/Pages/Authentication/Login.aspx");
 			}
 			else
 			{
-				// populate the topbar from session on every request
-				SetUserInfo(
-					Session["FullName"].ToString(),
-					Session["AccountNumber"].ToString()
-				);
-
-				// load the notification bell count and dropdown list
+				// populate topbar from session and load notification bell
+				SetUserInfo(Session["FullName"].ToString(), Session["AccountNumber"].ToString());
 				LoadNotifications();
 			}
 		}
 
-		// ── populates the topbar name, account number, and avatar initials ──
+		// populates the topbar name, account number, and avatar initials
 		public void SetUserInfo(string fullName, string accountNumber)
 		{
 			lblUserName.Text = fullName;
 			lblAccountNo.Text = accountNumber;
 
-			// build initials from the first and last word of the full name (e.g. "Juan Dela Cruz" → "JC")
+			// build initials from first and last word (e.g. "Juan Dela Cruz" → "JC")
 			string[] parts = fullName.Split(' ');
 			string initials = "";
 			if (parts.Length >= 2)
@@ -49,7 +42,7 @@ namespace DigitalWalletSystem
 			lblInitials.Text = initials.ToUpper();
 		}
 
-		// ── fetches recent transactions and compares against the persisted last-read datetime ──
+		// fetches recent transactions and compares against the persisted last-read datetime
 		private void LoadNotifications()
 		{
 			int userID = Convert.ToInt32(Session["UserID"]);
@@ -59,12 +52,9 @@ namespace DigitalWalletSystem
 			{
 				conn.Open();
 
-				// fetch the user's last-read timestamp from the database
-				// this persists across logouts so the read state is remembered
+				// fetch the user's last-read timestamp (persists across logouts)
 				DateTime? lastRead = null;
-				string sqlLastRead = "SELECT NotifLastRead FROM Users WHERE UserID = @UserID";
-
-				using (SqlCommand cmd = new SqlCommand(sqlLastRead, conn))
+				using (SqlCommand cmd = new SqlCommand("SELECT NotifLastRead FROM Users WHERE UserID = @UserID", conn))
 				{
 					cmd.Parameters.AddWithValue("@UserID", userID);
 					object result = cmd.ExecuteScalar();
@@ -77,10 +67,7 @@ namespace DigitalWalletSystem
 				// fetch the 20 most recent transactions to display as notifications
 				string sql = @"
                     SELECT TOP 20
-                        t.TransactionID,
-                        t.TransactionType,
-                        t.Amount,
-                        t.TransactionDate,
+                        t.TransactionID, t.TransactionType, t.Amount, t.TransactionDate,
                         COALESCE(u2.FullName, '') AS OtherPartyName
                     FROM Transactions t
                     LEFT JOIN Users u2 ON u2.UserID = CASE
@@ -94,22 +81,18 @@ namespace DigitalWalletSystem
 				using (SqlCommand cmd = new SqlCommand(sql, conn))
 				{
 					cmd.Parameters.AddWithValue("@UserID", userID);
-					SqlDataAdapter da = new SqlDataAdapter(cmd);
 					DataTable dt = new DataTable();
-					da.Fill(dt);
+					new SqlDataAdapter(cmd).Fill(dt);
 
 					// count transactions that occurred after the last-read timestamp
 					int unreadCount = 0;
 					foreach (DataRow row in dt.Rows)
 					{
 						DateTime txnDate = Convert.ToDateTime(row["TransactionDate"]);
-
-						// a transaction is unread if it happened after the last mark-all-read
-						bool isUnread = lastRead == null || txnDate > lastRead.Value;
-						if (isUnread) unreadCount++;
+						if (lastRead == null || txnDate > lastRead.Value) unreadCount++;
 					}
 
-					// cache last-read in session so the repeater's IsUnread helper can use it
+					// cache last-read in session so IsUnread() can use it in the repeater
 					Session["NotifLastRead"] = lastRead;
 
 					// show or hide the badge based on unread count
@@ -123,17 +106,16 @@ namespace DigitalWalletSystem
 						pnlNotifBadge.Visible = false;
 					}
 
-					// bind the notification list to the repeater
 					rptNotifications.DataSource = dt;
 					rptNotifications.DataBind();
 
-					// show the empty state panel if no transactions exist yet
+					// show empty state if no transactions exist yet
 					pnlNoNotifs.Visible = dt.Rows.Count == 0;
 				}
 			}
 		}
 
-		// ── mark all as read — saves the current datetime to the database ──
+		// mark all as read: saves the current datetime to the database
 		protected void btnMarkAllRead_Click(object sender, EventArgs e)
 		{
 			int userID = Convert.ToInt32(Session["UserID"]);
@@ -141,10 +123,8 @@ namespace DigitalWalletSystem
 
 			using (SqlConnection conn = new SqlConnection(connStr))
 			{
-				// persist the current datetime as the new last-read timestamp in the database
-				// any transaction before this moment will now be considered read on future logins too
+				// persist current datetime as new last-read marker
 				string sql = "UPDATE Users SET NotifLastRead = GETDATE() WHERE UserID = @UserID";
-
 				using (SqlCommand cmd = new SqlCommand(sql, conn))
 				{
 					cmd.Parameters.AddWithValue("@UserID", userID);
@@ -157,18 +137,18 @@ namespace DigitalWalletSystem
 			LoadNotifications();
 		}
 
-		// ── returns true if a transaction date is after the last-read timestamp ──
+		// returns true if a transaction date is after the last-read timestamp
 		protected bool IsUnread(object txnDateObj)
 		{
-			// retrieve the cached last-read value that was set during LoadNotifications
+			// retrieve the cached last-read value set during LoadNotifications
 			DateTime? lastRead = Session["NotifLastRead"] as DateTime?;
 			DateTime txnDate = Convert.ToDateTime(txnDateObj);
 
-			// if the user has never marked as read, everything is unread
+			// if never marked as read, everything is unread
 			return lastRead == null || txnDate > lastRead.Value;
 		}
 
-		// ── builds a human-readable message for each notification row ──
+		// builds message for each notification row
 		protected string GetNotifMessage(string type, string amount, string otherParty)
 		{
 			string formatted = "₱" + string.Format("{0:N2}", Convert.ToDecimal(amount));
@@ -182,7 +162,7 @@ namespace DigitalWalletSystem
 			}
 		}
 
-		// ── returns the css class for the colored icon beside each notification ──
+		// returns the css class for the colored icon beside each notification
 		protected string GetNotifIcon(string type)
 		{
 			switch (type)
