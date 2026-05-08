@@ -1,13 +1,38 @@
 ﻿<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="Logout.aspx.cs" Inherits="DigitalWalletSystem.Pages.Authentication.Logout" %>
+
 <!DOCTYPE html>
 <html lang="en">
 <head runat="server">
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Logging Out — CloudMoney</title>
+    <title>CloudMoney • Log Out</title>
     <link href="~/Styles/Site.css" rel="stylesheet" type="text/css" runat="server" />
     <style>
-        /* icon circle styled in red to signal a destructive action */
+        .site-brand {
+            position: fixed;
+            top: 18px;
+            left: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            pointer-events: none;
+            z-index: 100;
+        }
+        .site-brand-name { font-size: 15px; font-weight: 700; color: var(--text-muted); }
+        .site-brand-sub  { font-size: 11px; font-weight: 400; color: var(--text-muted); opacity: 0.6; }
+
+        .site-footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            text-align: center;
+            padding: 12px;
+            font-size: 12px;
+            color: var(--text-muted);
+            opacity: 0.6;
+        }
+
         .logout-icon {
             width: 68px;
             height: 68px;
@@ -20,7 +45,6 @@
             font-size: 28px;
         }
 
-        /* subtitle text below the heading */
         .logout-sub {
             font-size: 13px;
             color: var(--text-secondary);
@@ -29,50 +53,48 @@
             text-align: center;
         }
 
-        /* side-by-side button row */
-        .btn-row {
-            display: flex;
-            gap: 10px;
-        }
-
-        .btn-row .btn {
-            flex: 1;
-        }
+        .btn-row { display: flex; gap: 10px; }
+        .btn-row .btn { flex: 1; }
     </style>
 </head>
+
 <body>
+
+    <%-- top-left cloudmoney --%>
+    <div class="site-brand">
+        <div class="site-brand-name">&#9729; CloudMoney</div>
+        <div class="site-brand-sub">Digital Wallet</div>
+    </div>
+
+    <%-- copyright footer --%>
+    <div class="site-footer">&copy; <%= DateTime.Now.Year %> CloudMoney. All rights reserved.</div>
+
     <form id="form1" runat="server">
         <div class="auth-page">
             <div class="auth-card">
 
-                <%-- red icon circle indicating a logout action --%>
                 <div class="logout-icon">&#9099;</div>
-
                 <div class="auth-heading">Log Out</div>
 
-                <%-- confirmation message before the user proceeds --%>
+                <%-- confirmation message --%>
                 <div class="logout-sub">
                     Are you sure you want to log out of CloudMoney?<br />
                     You will be redirected to the login page.
                 </div>
 
-                <%-- cancel and confirm buttons side by side --%>
+                <%-- cancel and confirm buttons --%>
                 <div class="btn-row">
-                    <%-- cancel button — returns the user to the dashboard --%>
                     <asp:Button ID="btnCancel" runat="server"
-                        Text="Cancel"
-                        CssClass="btn btn-secondary"
+                        Text="Cancel" CssClass="btn btn-secondary"
                         OnClick="btnCancel_Click" />
-
-                    <%-- confirm button — clears session and redirects to login --%>
                     <asp:Button ID="btnLogout" runat="server"
-                        Text="Yes, Log Out"
-                        CssClass="btn btn-danger"
+                        Text="Yes, Log Out" CssClass="btn btn-danger"
                         OnClick="btnLogout_Click" />
                 </div>
 
             </div>
         </div>
     </form>
+
 </body>
 </html>
